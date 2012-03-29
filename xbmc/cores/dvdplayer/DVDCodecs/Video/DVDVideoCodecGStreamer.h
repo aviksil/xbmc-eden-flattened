@@ -59,6 +59,8 @@ private:
   // crop parameters
   bool m_crop;
   gint m_cropTop, m_cropLeft, m_cropWidth, m_cropHeight;
+  
+  bool m_interlaced;
 
   gboolean m_drop, m_reset, m_error;
 

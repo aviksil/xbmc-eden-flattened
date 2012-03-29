@@ -148,6 +148,7 @@ CDVDVideoCodecGStreamer::CDVDVideoCodecGStreamer()
   m_reset = false;
   m_error = false;
   m_crop = false;
+  m_interlaced = false;
 
   m_timebase = 1000.0;
 }
@@ -323,6 +324,15 @@ bool CDVDVideoCodecGStreamer::GetPicture(DVDVideoPicture* pDvdVideoPicture)
       return false;
     }
 
+    gboolean interlaced;
+    if (gst_structure_get_boolean(structure, "interlaced", &interlaced)){
+        if (interlaced){
+            m_interlaced = true;
+        }else{
+            m_interlaced = false;
+        }
+    }
+
     /* we could probably even lift this restriction on color formats
      * (note: update caps filter in gst pipeline if you do).. this
      * might make sense on OMAP3 where DSP codecs might be returning
@@ -363,6 +373,11 @@ bool CDVDVideoCodecGStreamer::GetPicture(DVDVideoPicture* pDvdVideoPicture)
     pDvdVideoPicture->iDisplayHeight = pDvdVideoPicture->iHeight;
     pDvdVideoPicture->iDisplayX      = 0;
     pDvdVideoPicture->iDisplayY      = 0;
+  }
+
+  if (m_interlaced)
+  {
+    pDvdVideoPicture->iDisplayHeight = pDvdVideoPicture->iDisplayHeight/2; 
   }
 
   pDvdVideoPicture->eglImageHandle = new GSTEGLImageHandle(buf, m_width, m_height, m_format);
